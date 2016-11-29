@@ -37,22 +37,22 @@ extension Double{
     func roundToDecimalDigits(decimals:Int) -> Double
     {
         let a : Double = self
-        var format : NSNumberFormatter = NSNumberFormatter()
-        format.numberStyle = NSNumberFormatterStyle.DecimalStyle
-        format.roundingMode = NSNumberFormatterRoundingMode.RoundHalfUp
+        let format : NumberFormatter = NumberFormatter()
+        
+        format.numberStyle = NumberFormatter.Style.decimal
+        format.roundingMode = NumberFormatter.RoundingMode.halfUp
         format.maximumFractionDigits = 2
-        var string: NSString = format.stringFromNumber(NSNumber.numberWithDouble(a))
-        println(string.doubleValue)
-        return string.doubleValue
+        let string: String = format.string(from: NSNumber(value: a))!
+        return Double(string)!
     }
 }
 
 extension String{
-    var length:Int {return countElements(self)}
-
+    var length:Int {return self.characters.count}
+    
     func containsString(s:String) -> Bool
     {
-        if(self.rangeOfString(s) != nil)
+        if(self.range(of: s) != nil)
         {
             return true
         }
@@ -62,9 +62,10 @@ extension String{
         }
     }
     
-    func containsString(s:String, compareOption: NSStringCompareOptions) -> Bool
+    func containsString(s:String, compareOption: NSString.CompareOptions) -> Bool
     {
-        if((self.rangeOfString(s, options: compareOption)) != nil)
+        
+        if((self.range(of: s, options: compareOption)) != nil)
         {
             return true
         }
@@ -76,12 +77,7 @@ extension String{
     
     func reverse() -> String
     {
-        var reverseString : String = ""
-        for c in self
-        {
-            reverseString = c + reverseString
-        }
-        return reverseString
+        return String(self.characters.reversed())
     }
 }
 
@@ -124,22 +120,22 @@ extension UIView{
     
     func setX(x:CGFloat) //only change the origin x
     {
-        self.frame.origin = CGPointMake(x, self.frame.origin.y)
+        self.frame.origin = CGPoint(x: x, y: self.frame.origin.y)
     }
     
     func setY(y:CGFloat) //only change the origin x
     {
-        self.frame.origin = CGPointMake(self.frame.origin.x, y)
+        self.frame.origin = CGPoint(x: self.frame.origin.x, y: y)
     }
     
     func setCenterX(x:CGFloat) //only change the origin x
     {
-        self.center = CGPointMake(x, self.center.y)
+        self.center = CGPoint(x: x, y: self.center.y)
     }
     
     func setCenterY(y:CGFloat) //only change the origin x
     {
-        self.center = CGPointMake(self.center.x, y)
+        self.center = CGPoint(x: self.center.x, y: y)
     }
     
     func roundCorner(radius:CGFloat)
@@ -210,11 +206,14 @@ extension UIImageView{
 extension UIImage{
     func croppedImage(bound : CGRect) -> UIImage
     {
-        var scaledBounds : CGRect = CGRectMake(bound.origin.x * self.scale, bound.origin.y * self.scale, bound.size.width * self.scale, bound.size.height * self.scale)
-        var imageRef = CGImageCreateWithImageInRect(self.CGImage, scaledBounds)
-        var croppedImage : UIImage = UIImage(CGImage: imageRef, scale: self.scale, orientation: UIImageOrientation.Up)
+        
+        let scaledBounds : CGRect = CGRect(x: bound.origin.x * self.scale, y: bound.origin.y * self.scale, width: bound.size.width * self.scale, height: bound.size.height * self.scale)
+        
+        guard let imageRef = self.cgImage?.cropping(to: scaledBounds) else{
+            print("No cgimage found")
+            return self
+        }
+        let croppedImage : UIImage = UIImage(cgImage: imageRef, scale: self.scale, orientation: UIImageOrientation.up)
         return croppedImage;
     }
 }
-
-
